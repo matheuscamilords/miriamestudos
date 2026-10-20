@@ -1,0 +1,5 @@
+const CACHE='miriam-estudos-v1-20261019';
+const CORE=['./','./index.html','./styles.css','./app.js','./data.js','./manifest.webmanifest','./assets/icon.svg','./materiais/edital_02_2026.pdf','./materiais/anexo_II_atribuicoes.pdf','./materiais/anexo_III_provas.pdf','./materiais/anexo_IV_conteudo.pdf','./materiais/retificacao_01.pdf','./materiais/cronograma_oficial.pdf'];
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('miriam-estudos-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET'||new URL(event.request.url).origin!==self.location.origin)return;event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(c=>c.put(event.request,copy));}return response;}).catch(()=>caches.match('./index.html'))));});
